@@ -3,7 +3,7 @@
   Garduino Project
   Editor: Carlos A. Lopez
   Created: 12/03/2014
-  Modified: 01/26/2016
+  Modified: 05/2/2016
 
   Objective: The intention of this program is to maintain the life of a indoor plant
 
@@ -214,7 +214,7 @@ void loop()
   //SetOut
   Output();
    
-  //send_NTP_TIME();
+  send_NTP_TIME();
 }
 
 void blink_out(int pin, int blink_time)
@@ -269,7 +269,7 @@ void send_NTP_TIME()
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
           client.println("Connection: close");  // the connection will be closed after completion of the response
-	  client.println("Refresh: 5");  // refresh the page automatically every 5 sec
+	  //client.println("Refresh: 5");  // refresh the page automatically every 5 sec
           client.println();
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");
@@ -291,6 +291,8 @@ void send_NTP_TIME()
           client.print(second());
           client.print("</b>");
           client.println("<br />");
+          client.print("<b>Time Set To Check Water: ");
+          client.print(time_set_check_to_water);
           client.println("</html>");
           break;
         }
