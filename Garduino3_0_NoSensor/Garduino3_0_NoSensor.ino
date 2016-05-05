@@ -104,6 +104,7 @@ time_t prevDisplay = 0; // when the digital clock was displayed
 
 //State Machine Variables
 int current_state = 0;      //Set to Startup State
+int prev_state = -1;         //Set Pev State
 
 void setup() 
 {
@@ -143,24 +144,30 @@ void loop()
   switch (current_state) 
   {
     case 0:  //Setup Case
-             update_clock();
-             Serial.println("CASE 0: Setup Case Started");
+             if(prev_state != current_state) 
+             {
+               update_clock();
+               Serial.println("CASE 0: Setup Case Started");
+             }
              time_set_check_to_water = now();    //Set Last Water Time
              time_diff = 0;                      //Temp Variable to Keep Difference between to timestamps
              pump_start_time = 0;                //Store Pump Start Time
              current_state = 1;                  //Change to Idle Case
-             update_clock();
-             Serial.println("CASE 0: Setup Case Finished");
+             //update_clock();
+             //Serial.println("CASE 0: Setup Case Finished");
+             prev_state = 0;
              break;
 
-    case 1:  //Idle Case
-            update_clock();
-            Serial.println("CASE 1: Idle Case Started");            
+    case 1: //Idle Case
+            if(prev_state != current_state) 
+            {
+              update_clock();
+              Serial.println("CASE 1: Idle Case Started");            
+            }
             blink_out(D2_Output_Program_OK, 500);
             //***CHECK IF PLANT IS READY FOR WATER***//
             time_diff = now() - time_set_check_to_water;  //Check Difference between Last Watering Time and current time
             
-                 
             if(day(time_diff)  > day_freq_to_water_plant)    //Use Day To Check how frequent to water plant
             {
               update_clock();
@@ -174,27 +181,39 @@ void loop()
             //***CHECK IF PLANT IS READY FOR LIGHT***//
             else if(hour(now()) >= time_light_hour_start)
             {
-              update_clock();
-              Serial.println("CASE 1 >> Time to turn on Lights!");
+              if(RELAY_LIGHT_STATE == LOW)
+              {
+                update_clock();
+                Serial.print("CASE 1 >> Time to turn on Lights! ->");
+                Serial.println(hour(now()));
+              }
               current_state = 3;  //Change to Turn Light On State
             }
             
             else if(hour(now()) <= time_light_hour_stop)
             {
-              update_clock();
-              Serial.println("CASE 1 >> Time to turn off Lights!");
+              if(RELAY_LIGHT_STATE == HIGH)
+              {
+                update_clock();
+                Serial.print("CASE 1 >> Time to turn off Lights!");
+                Serial.println(hour(now()));
+              }
               current_state = 4;  //Change to Turn Light Off State
             }
             
-            update_clock();            
-            Serial.println("CASE 1: Idle Case Finished");
+            //update_clock();            
+            //Serial.println("CASE 1: Idle Case Finished");
+            prev_state = 1;
             break;
     
     case 2:  //Water Pump On State
-            update_clock();
-            Serial.println("CASE 2: Water Pump On Case Started");
-            time_diff = now() - pump_start_time;
+            if(prev_state != current_state)
+            {
+              update_clock();
+              Serial.println("CASE 2: Water Pump On Case Started");
+            }
             
+            time_diff = now() - pump_start_time;
             if (second(time_diff) > max_watering_time)
             {
               update_clock();
@@ -209,26 +228,32 @@ void loop()
             RELAY_PUMP_STATE = LOW;     //Set Pump
             blink_out(D3_Output_Light_Pump, 500);
             
-            update_clock();            
-            Serial.println("CASE 2: Water Pump On Case Finished");
+            //update_clock();            
+            //Serial.println("CASE 2: Water Pump On Case Finished");
+            prev_state = 2;
             break;            
-
+            
      case 3:  //Turn Light ON State
-            update_clock();
-            Serial.println("CASE 3: Light ON State Started");
+            if(prev_state != current_state)
+            {
+              update_clock();
+              Serial.println("CASE 3: Light ON State Started");
+            }
             RELAY_LIGHT_STATE = LOW;  //Set Light
             current_state = 1;        //Return to Idle Case
-            update_clock();
-            Serial.println("CASE 3: Light ON State Finished");
+            //update_clock();
+            //Serial.println("CASE 3: Light ON State Finished");
+            prev_state = 3;
             break;
-
+            
      case 4:  //Turn Light OFF State
             update_clock();
             Serial.println("CASE 4: Light OFF State Started");
             RELAY_LIGHT_STATE = HIGH;  //Set Light
             current_state = 1;         //Return to Idle Case
-            update_clock();
-            Serial.println("CASE 4: Light OFF State Finished");
+            //update_clock();
+            //Serial.println("CASE 4: Light OFF State Finished");
+            prev_state = 4;
             break;
      default:
             break;
@@ -261,7 +286,7 @@ void update_clock()
   printDigits(minute());
   Serial.print(":");
   printDigits(second());
-  Serial.println("] - ");
+  Serial.print("] - ");
 }
 
 void printDigits(int digits){
