@@ -380,11 +380,11 @@ time_t get_NTP_TIME()
     // combine the four bytes (two words) into a long integer
     // this is NTP time (seconds since Jan 1 1900):
     unsigned long secsSince1900 = highWord << 16 | lowWord;  
-    Serial.print("Seconds since Jan 1 1900 = " );
-    Serial.println(secsSince1900);               
+    //Serial.print("Seconds since Jan 1 1900 = " );
+    //Serial.println(secsSince1900);               
 
     // now convert NTP time into everyday time:
-    Serial.print("Unix time = ");
+    Serial.print("Update Clock!... New Unix Time: ");
     // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
     const unsigned long seventyYears = 2208988800UL + timeZone * SECS_PER_HOUR;     
     // subtract seventy years:
