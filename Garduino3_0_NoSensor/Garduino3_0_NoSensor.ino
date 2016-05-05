@@ -181,7 +181,7 @@ void loop()
             //***CHECK IF PLANT IS READY FOR LIGHT***//
             else if(hour(now()) >= time_light_hour_start)
             {
-              if(RELAY_LIGHT_STATE == LOW)
+              if(RELAY_LIGHT_STATE != LOW)
               {
                 update_clock();
                 Serial.print("CASE 1 >> Time to turn on Lights! ->");
@@ -192,7 +192,7 @@ void loop()
             
             else if(hour(now()) <= time_light_hour_stop)
             {
-              if(RELAY_LIGHT_STATE == HIGH)
+              if(RELAY_LIGHT_STATE != HIGH)
               {
                 update_clock();
                 Serial.print("CASE 1 >> Time to turn off Lights!");
