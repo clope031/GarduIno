@@ -179,7 +179,7 @@ void loop()
             }
             
             //***CHECK IF PLANT IS READY FOR LIGHT***//
-            else if(hour(now()) >= time_light_hour_start)
+            else if(((hour(now()) >= time_light_hour_start) && (hour(now()) <= time_light_hour_stop)))
             {
               if(RELAY_LIGHT_STATE != LOW)
               {
@@ -190,7 +190,7 @@ void loop()
               current_state = 3;  //Change to Turn Light On State
             }
             
-            else if(hour(now()) <= time_light_hour_stop)
+            else if((hour(now()) < time_light_hour_start) || (hour(now()) > time_light_hour_stop))
             {
               if(RELAY_LIGHT_STATE != HIGH)
               {
