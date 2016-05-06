@@ -134,9 +134,9 @@ void setup()
   
   //Initialize Inputs
   pinMode(D7_Input_Manual_Mode, INPUT);
-    
+  
+  update_clock();  
   Serial.println("Start System");
-  //update_clock();
 }
 
 void loop() 
@@ -179,25 +179,25 @@ void loop()
             }
             
             //***CHECK IF PLANT IS READY FOR LIGHT***//
-            else if(hour(now()) >= time_light_hour_start)
+            else if(((hour(now()) >= time_light_hour_start) && (hour(now()) <= time_light_hour_stop)) && RELAY_LIGHT_STATE == HIGH)
             {
-              if(RELAY_LIGHT_STATE == LOW)
-              {
+              //if(RELAY_LIGHT_STATE != LOW)
+              //{
                 update_clock();
                 Serial.print("CASE 1 >> Time to turn on Lights! ->");
                 Serial.println(hour(now()));
-              }
+              //}
               current_state = 3;  //Change to Turn Light On State
             }
             
-            else if(hour(now()) <= time_light_hour_stop)
+            else if(((hour(now()) < time_light_hour_start) || (hour(now()) > time_light_hour_stop)) && RELAY_LIGHT_STATE == LOW)
             {
-              if(RELAY_LIGHT_STATE == HIGH)
-              {
+              //if(RELAY_LIGHT_STATE != HIGH)
+              //{
                 update_clock();
                 Serial.print("CASE 1 >> Time to turn off Lights!");
                 Serial.println(hour(now()));
-              }
+              //}
               current_state = 4;  //Change to Turn Light Off State
             }
             
@@ -364,6 +364,10 @@ void send_NTP_TIME()
 
 time_t get_NTP_TIME()
 {
+//  if(current_state != 0)
+//  {
+//    update_clock();        
+//  }
   sendNTPpacket(timeServer); // send an NTP packet to a time server
 
   // wait to see if a reply is available
@@ -380,11 +384,12 @@ time_t get_NTP_TIME()
     // combine the four bytes (two words) into a long integer
     // this is NTP time (seconds since Jan 1 1900):
     unsigned long secsSince1900 = highWord << 16 | lowWord;  
-    Serial.print("Seconds since Jan 1 1900 = " );
-    Serial.println(secsSince1900);               
+    //Serial.print("Seconds since Jan 1 1900 = " );
+    //Serial.println(secsSince1900);               
 
     // now convert NTP time into everyday time:
-    Serial.print("Unix time = ");
+    //update_clock();
+    Serial.print("Update Clock... New Unix Time: ");
     // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
     const unsigned long seventyYears = 2208988800UL + timeZone * SECS_PER_HOUR;     
     // subtract seventy years:
@@ -395,19 +400,19 @@ time_t get_NTP_TIME()
     //Sync Time
     return(epoch);
 
-    // print the hour, minute and second:
-    Serial.print("The UTC time is ");       // UTC is the time at Greenwich Meridian (GMT)
-    Serial.print(':');
-    Serial.print(':');  
-    if ( ((epoch % 3600) / 60) < 10 ) {
-       // In the first 10 minutes of each hour, we'll want a leading '0'
-      Serial.print('0');
-    }
-    Serial.print(':'); 
-    if ( (epoch % 60) < 10 ) {
-      // In the first 10 seconds of each minute, we'll want a leading '0'
-      Serial.print('0');
-    }
+//    // print the hour, minute and second:
+//    Serial.print("The UTC time is ");       // UTC is the time at Greenwich Meridian (GMT)
+//    Serial.print(':');
+//    Serial.print(':');  
+//    if ( ((epoch % 3600) / 60) < 10 ) {
+//       // In the first 10 minutes of each hour, we'll want a leading '0'
+//      Serial.print('0');
+//    }
+//    Serial.print(':'); 
+//    if ( (epoch % 60) < 10 ) {
+//      // In the first 10 seconds of each minute, we'll want a leading '0'
+//      Serial.print('0');
+//    }
   }
   return 0;  
 }
