@@ -91,6 +91,8 @@ int RELAY_LIGHT_STATE = HIGH;
 time_t time_set_check_to_water;
 time_t time_diff;                               //Temp Variable to Keep Difference between to timestamps
 time_t pump_start_time;                         //Store Pump Start Time
+time_t PowerUpTime;
+
 const unsigned long max_watering_time = 30;     //30 seconds
 const int day_freq_to_water_plant = 1;           //Every two days water plant
 int water_counter = 0;
@@ -137,6 +139,9 @@ void setup()
   
   update_clock();  
   Serial.println("Start System");
+  
+  //Power On Time
+  PowerUpTime = now();
 }
 
 void loop() 
@@ -174,7 +179,6 @@ void loop()
               Serial.println("CASE 1 >> Time to water plant");
               pump_start_time = now();  //Store Pump Turning On Time
               current_state = 2;        //Change to Turn Pump On State
-              water_counter++;
               break;
             }
             
@@ -222,6 +226,7 @@ void loop()
               LED_WATERING_STATE = LOW;         //Reset Watering LED Signal
               time_set_check_to_water = now();  //Set Last Water Time
               current_state = 1;                //Return to Idle Case
+              water_counter++;
               break;
             }
       
@@ -322,25 +327,51 @@ void send_NTP_TIME()
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");
           client.println("<b> Welcome to Foli Monitoring System </b><br/>");
-          client.print("<b>Humidity Sensor Level: ");
+          //client.print("<b>Humidity Sensor Level: ");
           //client.print(Humidity_Current);
           client.println("</b><br/>");
-          client.print("<b>Last Time Foli was water: ");
+          client.print("<b>Current Time & Date: </b>");
           client.print(month());
-          client.print("/");
+          client.print("-");
           client.print(day());
-          client.print("/");
-          client.print(year());
+          client.print("-");
+          client.print(year()); 
           client.print(" ");
           client.print(hour());
           client.print(":");
           client.print(minute());
           client.print(":");
           client.print(second());
-          client.print("</b>");
-          client.println("<br />");
-          client.print("<b>Time Set To Check Water: ");
-          client.print(time_set_check_to_water);
+          client.print("<br>");
+          client.print("<b>Power Up Time & Date: </b>");
+          client.print(month(PowerUpTime));
+          client.print("-");
+          client.print(day(PowerUpTime));
+          client.print("-");
+          client.print(year(PowerUpTime)); 
+          client.print(" ");
+          client.print(hour(PowerUpTime));
+          client.print(":");
+          client.print(minute(PowerUpTime));
+          client.print(":");
+          client.print(second(PowerUpTime));
+          client.print("<br>");
+          client.print("<b>Time Set To Check Water: </b> ");
+          client.print(month(time_set_check_to_water));
+          client.print("-");
+          client.print(day(time_set_check_to_water));
+          client.print("-");
+          client.print(year(time_set_check_to_water)); 
+          client.print(" ");
+          client.print(hour(time_set_check_to_water));
+          client.print(":");
+          client.print(minute(time_set_check_to_water));
+          client.print(":");
+          client.print(second(time_set_check_to_water));
+          client.print("<br>");
+          client.print("<b>Watering Counter: </b>");
+          client.print(water_counter);
+          client.print("<br>");
           client.println("</html>");
           break;
         }
